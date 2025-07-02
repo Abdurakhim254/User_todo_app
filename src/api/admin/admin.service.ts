@@ -1,10 +1,15 @@
 import { Injectable } from '@nestjs/common';
 import { CreateAdminDto } from './dto/create-admin.dto';
 import { UpdateAdminDto } from './dto/update-admin.dto';
+import { PrismaService } from '@/common/prisma';
 
 @Injectable()
 export class AdminService {
-  create(createAdminDto: CreateAdminDto) {
+
+  constructor (
+    private readonly prismaService: PrismaService
+  ){}
+  async create(createAdminDto: CreateAdminDto) {
     return 'This action adds a new admin';
   }
 
