@@ -2,6 +2,7 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { config } from 'src/config';
 import { HttpStatus, ValidationPipe } from '@nestjs/common';
+import { AllExceptionsFilter } from '@/infrastructure';
 
 export class Application {
   static async main(): Promise<void> {
@@ -15,6 +16,7 @@ export class Application {
         transform: true,
       }),
     );
+    app.useGlobalFilters(new AllExceptionsFilter());
     app.listen(config.API_PORT || 3000);
 
   }

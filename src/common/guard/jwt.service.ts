@@ -2,6 +2,7 @@ import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { JwtConfigI } from 'src/config';
+import { TokenProps } from '../interface';
 
 @Injectable()
 export class TokenService {
@@ -39,7 +40,7 @@ export class TokenService {
     }
   }
 
-  async verifyRefreshToken(token: string): Promise<any> {
+  async verifyRefreshToken(token: string): Promise<TokenProps> {
     try {
       const payload = await this.jwtService.verifyAsync(token, {
         secret: this.jwtConfig.refresh_secret,
