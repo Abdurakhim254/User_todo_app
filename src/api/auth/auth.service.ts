@@ -1,10 +1,13 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateAuthdto} from './dto/create-auth.dto';
 import { PrismaService } from '@/common/prisma';
 import { BcryptEncryption } from '@/infrastructure';
 import { LoginAuthdto } from './dto/login.dto';
 import { TokenService } from '@/common/guard/jwt.service';
 import { TokensDto } from './dto/access.refresh.token.dto';
+import { ForgetPasswordDto } from './dto/forgot.password.dto';
+import { UpdateAuthDto } from './dto/update.auth.dto';
+import { ResetPassworddto } from './dto/reset.password.dto';
 
 @Injectable()
 export class AuthService {
@@ -88,4 +91,73 @@ export class AuthService {
     }
   }
 
+  async forgetPassword(forgetdto:ForgetPasswordDto) {
+    const user=await this.prismaService.user.findUnique({where:{email:forgetdto.email}})
+    if(!user){
+      return {
+        message:'User not found'
+      }
+    }
+    else{
+      const payload={
+        email:user.email,
+        role:user.role
+      }
+      const access_token=this.tokenservice.createAccessToken(payload)
+      return {
+        access_token
+      }
+    }
+  }
+
+  async getMe(email:string){
+    const user=await this.prismaService.user.findUnique({where:{email:email}})
+    return {
+      message:'User found successfully',
+      data:user
+    }
+  }
+
+  async updateMe(email: string, updateAuthDto: UpdateAuthDto) {
+    const user = await this.prismaService.user.findUnique({
+      where: { email },
+    });
+  
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+  
+    const updateData: any = {
+      full_name: updateAuthDto.full_name,
+    };
+  
+    if (updateAuthDto.password) {
+      const hashedPassword = await BcryptEncryption.encrypt(updateAuthDto.password);
+      updateData.password = hashedPassword;
+    }
+  
+    const updatedUser = await this.prismaService.user.update({
+      where: { email },
+      data: updateData,
+    });
+  
+    return {
+      message: 'User updated successfully',
+      data: updatedUser,
+    };
+  }
+  
+
+  async resetPassword(resetpassworddto:ResetPassworddto){
+    const payload=await this.tokenservice.verifyAccessToken(resetpassworddto.access_token)
+    await this.prismaService.user.findUnique({where:{email:payload.email}})
+    const hashed_password=await BcryptEncryption.encrypt(resetpassworddto.password)
+    const updatedUser=await this.prismaService.user.update({where:{email:payload.email},data:{password:hashed_password}})
+    return {
+      message:'Password updated successfully',
+      updatedUser
+    }
+
+  }
 }
+

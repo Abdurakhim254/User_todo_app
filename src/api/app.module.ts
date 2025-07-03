@@ -7,6 +7,7 @@ import { TasksModule } from './tasks/tasks.module';
 import { ConfigModule } from '@nestjs/config';
 import { jwtConfig } from '@/config';
 import { PrismaModule } from '@/common/prisma';
+import { AuthGuard } from '@/common/guard/auth.guard';
 @Module({
   imports: [
     ThrottlerModule.forRoot({
@@ -27,6 +28,11 @@ import { PrismaModule } from '@/common/prisma';
     providers:[{
       provide: APP_GUARD,
       useClass: ThrottlerGuard,
-    },]
+    },
+    {
+      provide: APP_GUARD,
+      useClass: AuthGuard,
+    }
+  ]
 })
 export class AppModule {}
