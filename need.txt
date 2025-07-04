@@ -1,1 +1,0 @@
-//status codelar ,global hamda admin uchun guard yozish ,tasklardagi getni togrlash,authni yakunlash,swagger
