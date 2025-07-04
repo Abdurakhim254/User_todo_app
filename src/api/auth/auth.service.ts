@@ -102,9 +102,9 @@ export class AuthService {
         email:user.email,
         role:user.role
       }
-      const access_token=this.tokenservice.createAccessToken(payload)
+      const token=this.tokenservice.createAccessToken(payload)
       return {
-        access_token
+        token
       }
     }
   }
@@ -148,7 +148,7 @@ export class AuthService {
   
 
   async resetPassword(resetpassworddto:ResetPassworddto){
-    const payload=await this.tokenservice.verifyAccessToken(resetpassworddto.access_token)
+    const payload=await this.tokenservice.verifyAccessToken(resetpassworddto.token)
     await this.prismaService.user.findUnique({where:{email:payload.email}})
     const hashed_password=await BcryptEncryption.encrypt(resetpassworddto.password)
     const updatedUser=await this.prismaService.user.update({where:{email:payload.email},data:{password:hashed_password}})

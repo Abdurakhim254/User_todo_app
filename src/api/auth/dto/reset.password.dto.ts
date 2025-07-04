@@ -4,7 +4,7 @@ export class ResetPassworddto {
   
   @IsNotEmpty()
   @IsString()
-  access_token: string;
+  token: string;
 
   @IsString()
   @IsNotEmpty()
