@@ -1,6 +1,7 @@
 import {
   ForbiddenException,
   Injectable,
+  NotFoundException,
 } from '@nestjs/common';
 import { PrismaService } from '@/common/prisma';
 import { UserRoles } from '@prisma/client';
@@ -22,20 +23,20 @@ export class AdminService {
       };
     }
 
-    return {
+    throw new NotFoundException({
       message: 'No users found',
       data: [],
-    };
+    });
   }
 
   async findOne(id: number) {
     const user = await this.prismaService.user.findUnique({ where: { id } });
 
     if (!user) {
-      return {
-        message: 'User not found',
+      throw new NotFoundException({
+        message: 'No user found',
         data: [],
-      };
+      });
     }
 
     if (
@@ -46,18 +47,18 @@ export class AdminService {
 
     return {
       message: 'User found successfully',
-      data: user,
-    };
+      data: user
+      };
   }
 
   async update(id: number, dto: UpdateAdminDto) {
     const user = await this.prismaService.user.findUnique({ where: { id } });
 
     if (!user) {
-      return {
-        message: 'User not found',
+      throw new NotFoundException({
+        message: 'No user found',
         data: [],
-      };
+      });
     }
 
     if (
@@ -81,10 +82,10 @@ export class AdminService {
     const user = await this.prismaService.user.findUnique({ where: { id } });
 
     if (!user) {
-      return {
-        message: 'User not found',
+      throw new NotFoundException({
+        message: 'No task found',
         data: [],
-      };
+      });
     }
 
     if (

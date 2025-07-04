@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateTaskDto } from './dto/create-task.dto';
 import { UpdateTaskDto } from './dto/update-task.dto';
 import { PrismaService } from '@/common/prisma';
@@ -10,8 +10,8 @@ export class TasksService {
   async create(createTaskDto: CreateTaskDto) {
     const task=await this.prismaService.tasks.create({data:createTaskDto});
     return {
-      message:'Task created successfully',
-      data:task
+      message: 'Task created successfully',
+      data: task,
     };
   }
 
@@ -23,10 +23,10 @@ export class TasksService {
         data:task
       };
     }
-    return {
-      message:'No tasks found',
-      data:[]
-    };
+    throw new NotFoundException({
+      message: 'No tasks found',
+      data: [],
+    });
   }
 
   async findOne(id: number) {
@@ -37,10 +37,10 @@ export class TasksService {
         data:task
       };
     }
-    return {
-      message:'No task found',
-      data:[]
-    };
+    throw new NotFoundException({
+      message: 'No task found',
+      data: [],
+    });
   }
 
   async update(id: number, updateTaskDto: UpdateTaskDto) {
@@ -52,24 +52,28 @@ export class TasksService {
         data:updatedTask
       };
     }
-    return {
-      message:'No task found',
-      data:[]
-    };
+    throw new NotFoundException({
+      message: 'No task found',
+      data: [],
+    });
   }
 
-  async remove(id: number) {
-    const task=await this.prismaService.tasks.findUnique({where:{id}});
-    if(task){
-      const deletedTask=await this.prismaService.tasks.delete({where:{id}});
-      return {
-        message:'Task deleted successfully',
-        data:deletedTask
-      };
-    }
-    return {
-      message:'No task found',
-      data:[]
-    };
+ 
+async remove(id: number) {
+  const task = await this.prismaService.tasks.findUnique({ where: { id } });
+
+  if (!task) {
+    throw new NotFoundException({
+      message: 'No task found',
+      data: [],
+    });
   }
+
+  const deletedTask = await this.prismaService.tasks.delete({ where: { id } });
+
+  return {
+    message: 'Task deleted successfully',
+    data: deletedTask,
+  };
+}
 }

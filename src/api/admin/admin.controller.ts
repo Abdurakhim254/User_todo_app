@@ -1,7 +1,9 @@
-import { Controller, Get,  Body, Param, Delete, Put } from '@nestjs/common';
+import { Controller, Get,  Body, Param, Delete, Put, UseGuards } from '@nestjs/common';
 import { AdminService } from './admin.service';
 import { UpdateAdminDto } from './dto/update-admin.dto';
+import { AdminGuard } from '@/common/guard/admin.guard';
 
+@UseGuards(AdminGuard)
 @Controller('admin')
 export class AdminController {
   constructor(private readonly adminService: AdminService) {}

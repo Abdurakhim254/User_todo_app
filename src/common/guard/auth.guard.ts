@@ -23,19 +23,20 @@ export class AuthGuard implements CanActivate {
 
     const [type, token] = request.headers.authorization?.split(' ') || [];
 
+    
     if (type !== 'Bearer' || !token) {
       return false;
     }
 
     try {
-      const decoded = await this.jwtService.verifyAsync(token, {
+      const decoded = await this.jwtService.verify(token, {
         secret: process.env.JWT_ACCESS_SECRET,
       });
-
+            
       request.user = decoded;
       return true;
     } catch (error) {
-      return false;
+            return false;
     }
   }
 }

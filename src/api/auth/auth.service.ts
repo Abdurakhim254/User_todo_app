@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { CreateAuthdto} from './dto/create-auth.dto';
 import { PrismaService } from '@/common/prisma';
 import { BcryptEncryption } from '@/infrastructure';
@@ -20,9 +20,9 @@ export class AuthService {
     const admin=await this.prismaService.user.findUnique({where:{email:createAuthDto.email}});
 
     if(admin){
-      return {
+      throw new BadRequestException({
         message:'User is already registered'
-      }
+      })
     }
 
     const hashed_password=await BcryptEncryption.encrypt(createAuthDto.password)
@@ -38,7 +38,6 @@ export class AuthService {
 
     return {
       message:"You have successfully registered.",
-      status_code:201,
       data:user
     }
   }
@@ -47,17 +46,17 @@ export class AuthService {
     const user=await this.prismaService.user.findUnique({where:{email:logindto.email}})
     
     if(!user){
-      return {
+      throw new BadRequestException({
         message:'Email or password is incorrect'
-      }
+      })
 
     }
 
     const isMatch=await BcryptEncryption.compare(logindto.password,user.password)
     if(!isMatch){
-      return {
+      throw new BadRequestException({
         message:'Email or password is incorrect'
-      }
+      })
     }
     const payload={
       email:user.email,
@@ -94,9 +93,9 @@ export class AuthService {
   async forgetPassword(forgetdto:ForgetPasswordDto) {
     const user=await this.prismaService.user.findUnique({where:{email:forgetdto.email}})
     if(!user){
-      return {
+      throw new NotFoundException( {
         message:'User not found'
-      }
+      })
     }
     else{
       const payload={

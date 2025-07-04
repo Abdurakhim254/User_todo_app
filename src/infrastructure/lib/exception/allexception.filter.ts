@@ -16,11 +16,9 @@ import {
       const status =
         exception instanceof HttpException
           ? exception.getStatus()
-          : HttpStatus.INTERNAL_SERVER_ERROR;
-
-
-          console.error(exception);
-          
+          : HttpStatus.INTERNAL_SERVER_ERROR;   
+          console.log(exception);
+                 
       let error_message = 'Internal server error';
       if (exception instanceof HttpException) {
         const exception_response = exception.getResponse();

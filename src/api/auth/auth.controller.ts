@@ -29,10 +29,7 @@ export class AuthController {
   @Get('me')
   getMe(@Req() req:any) {
     const email = req.user?.email;
-
-    console.log(email);
-    
-
+  
     return this.authService.getMe(email);
   }
 
